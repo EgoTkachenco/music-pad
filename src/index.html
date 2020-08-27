@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500&display=swap" rel="stylesheet">
+    <script src="vue.js"></script>
+    <script src="pizzicato.js"></script>
+    <link rel="stylesheet" href="output.css">
+</head>
+<body>
+
+<main id="midi-frame">
+    <div class="midi-frame">
+        <div class="pads">
+            <pad-btn key-name="s" @action="soundChange($event)"></pad-btn>
+            <pad-btn key-name="d" @action="soundChange($event)"></pad-btn>
+            <pad-btn key-name="j" @action="soundChange($event)"></pad-btn>
+            <pad-btn key-name="k" @action="soundChange($event)"></pad-btn>
+        </div>
+
+        <div class="control">
+            <button class="control-btn" :disabled="group" @click="initMidiFrame(0)">
+                <div class="control-btn-img"></div>
+            </button>
+            <div class="control-btn-label">rec</div>
+
+            <div class="control-line"></div>
+
+            <button class="control-btn" :disabled="!group" @click="playGroup">
+                <div class="control-btn-img" style="transform: rotate(90deg)"></div>
+            </button>
+            <div class="control-btn-label" >play/pause</div>
+
+            <div class="control-line"></div>
+
+            <button class="control-btn">
+                <div class="control-btn-img" style="transform: rotate(180deg)"></div>
+            </button>
+            <div class="control-btn-label">new loop</div>
+        </div>
+
+        <div class="midi-frame__right">
+            <div class="midi-frame__right-top">
+                <div>
+                    <button class="control-btn">
+                        <div class="control-btn-img" style="transform: rotate(270deg)"></div>
+                    </button>
+                    <div class="control-btn-label">swap pads</div>
+                </div>
+                <div class="midi-frame__right-top-lines">
+                    <div class="midi-frame__right-top-line"></div>
+                    <div class="midi-frame__right-top-line"></div>
+                    <div class="midi-frame__right-top-line"></div>
+                </div>
+            </div>
+            <div class="filter-control">
+                <effect-control-view effect-name="Reverb"
+                                     :level="reverbLevel">
+                </effect-control-view>
+                <effect-control-view effect-name="Delay"
+                                     :level="delayLevel">
+                </effect-control-view>
+                <effect-control-view effect-name="Low Pass"
+                                     :level="lowPassLevel">
+                </effect-control-view>
+            </div>
+        </div>
+
+        <div class="midi-frame-bg"></div>
+    </div>
+
+    <div class="midi-bottom">
+        <div class="metronom">
+            <img src="./assets/metronom.svg" alt="metronom">
+        </div>
+
+        <div class="filter-control">
+            <effect-control effect-name="Reverb"
+                                 :level="reverbLevel"
+                                 key-up="2"
+                                 key-down="1"
+                                 @action="effectChange($event)">
+            </effect-control>
+            <effect-control effect-name="Delay"
+                                 :level="delayLevel"
+                                 key-up="4"
+                                 key-down="3"
+                                 @action="effectChange($event)">
+            </effect-control>
+            <effect-control effect-name="Low Pass"
+                                 :level="lowPassLevel"
+                                 key-up="6"
+                                 key-down="5"
+                                 @action="effectChange($event)">
+            </effect-control>
+        </div>
+    </div>
+</main>
+
+<!-- Effect Control View -->
+<template id="effect-control-view-template">
+    <div class="effect-control__item">
+        <div class="effect-control__item-controller">
+
+            <div class="effect-control__item-controller-btn"
+                :style="{'transform': `rotate(${rotateDegree[level]})`}">
+                <div class="effect-control__item-controller-line"></div>
+            </div>
+
+            <div class="effect-control__item-controller-dot"
+                 :class="{'active': i - 1 == level}"
+                 v-for="i in 11"
+                 :key="i">
+            </div>
+        </div>
+
+        <div class="effects-control__item-title">{{effectName}}</div>
+    </div>
+</template>
+
+<template id="effect-control-template">
+    <div class="effect-control">
+        <div class="effect-control-level">
+            <div class="effect-control-level__line"
+                 v-for="i in 10"
+                 :key="i"
+                 :class="{'active': i - 1 < level}"
+                 :style="{height: i * 10 + '%'}"></div>
+        </div>
+        <div class="effect-control-btns">
+            <button class="effect-control-btn"
+                    @click="changeDown"
+                    :class="{'active': isDown}">{{keyDown}}</button>
+            <button class="effect-control-btn"
+                    @click="changeUp"
+                    :class="{'active': isUp}">{{keyUp}}</button>
+        </div>
+        <div class="effect-control-title">{{effectName}}</div>
+    </div>
+</template>
+
+<!--Pad Button Template-->
+<template id="pad-btn-template">
+    <button class="pads-btn"
+            :class="{'active': isPlay}"
+            @mouseup="stopSound"
+            @mousedown="playSound"
+    >{{keyName}}</button>
+</template>
+
+
+<script src="index.js"></script>
+</body>
+</html>
