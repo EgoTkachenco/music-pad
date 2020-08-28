@@ -14,30 +14,63 @@
 <body>
 
 <main id="midi-frame">
+    <div class="help-wrapper" v-if="!isInited">
+        <div class="help-dialog">
+            <div class="help-dialog__title">Keyboard Instruction</div>
+
+            <div class="help-dialog__btns">
+                <div class="help-dialog__btns-item">q</div>
+                <div class="help-dialog__btns-item">w</div>
+                <div class="help-dialog__btns-item">a</div>
+                <div class="help-dialog__btns-item">d</div>
+            </div>
+
+            <div class="help-dialog__label">to activate pads</div>
+
+            <div class="help-dialog__line"></div>
+
+            <div class="help-dialog__btns">
+                <div class="help-dialog__btns-item">1</div>
+                <div class="help-dialog__btns-item">2</div>
+                <div class="help-dialog__btns-item">3</div>
+                <div class="help-dialog__btns-item">4</div>
+                <div class="help-dialog__btns-item">5</div>
+                <div class="help-dialog__btns-item">6</div>
+            </div>
+
+            <div class="help-dialog__label">to change effects</div>
+
+            <div class="help-dialog__line"></div>
+
+            <button class="help-dialog__init-btn" @click="initMidiFrame(0)">Start</button>
+
+        </div>
+    </div>
+    <!-- <span style="color: #fff">{{recordStart}} {{record}}</span> -->
     <div class="midi-frame">
         <div class="pads">
+            <pad-btn key-name="q" @action="soundChange($event)"></pad-btn>
+            <pad-btn key-name="w" @action="soundChange($event)"></pad-btn>
+            <pad-btn key-name="a" @action="soundChange($event)"></pad-btn>
             <pad-btn key-name="s" @action="soundChange($event)"></pad-btn>
-            <pad-btn key-name="d" @action="soundChange($event)"></pad-btn>
-            <pad-btn key-name="j" @action="soundChange($event)"></pad-btn>
-            <pad-btn key-name="k" @action="soundChange($event)"></pad-btn>
         </div>
 
         <div class="control">
-            <button class="control-btn" :disabled="group" @click="initMidiFrame(0)">
+            <button class="control-btn" @click="startRecording" :disabled="isRecording">
                 <div class="control-btn-img"></div>
             </button>
             <div class="control-btn-label">rec</div>
 
             <div class="control-line"></div>
 
-            <button class="control-btn" :disabled="!group" @click="playGroup">
+            <button class="control-btn" @click="isPause ? playLoops() : pauseLoops()">
                 <div class="control-btn-img" style="transform: rotate(90deg)"></div>
             </button>
-            <div class="control-btn-label" >play/pause</div>
+            <div class="control-btn-label">play/pause</div>
 
             <div class="control-line"></div>
 
-            <button class="control-btn">
+            <button class="control-btn" @click="startNewLoop">
                 <div class="control-btn-img" style="transform: rotate(180deg)"></div>
             </button>
             <div class="control-btn-label">new loop</div>
@@ -58,14 +91,11 @@
                 </div>
             </div>
             <div class="filter-control">
-                <effect-control-view effect-name="Reverb"
-                                     :level="reverbLevel">
+                <effect-control-view effect-name="Reverb" :level="reverbLevel">
                 </effect-control-view>
-                <effect-control-view effect-name="Delay"
-                                     :level="delayLevel">
+                <effect-control-view effect-name="Delay" :level="delayLevel">
                 </effect-control-view>
-                <effect-control-view effect-name="Low Pass"
-                                     :level="lowPassLevel">
+                <effect-control-view effect-name="Low Pass" :level="lowPassLevel">
                 </effect-control-view>
             </div>
         </div>
