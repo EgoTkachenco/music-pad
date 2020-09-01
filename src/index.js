@@ -99,6 +99,9 @@ new Vue({
     },
     loops: [],
 
+    isMetronom: false,
+    metronom: null,
+
     reverbFilter: new Pizzicato.Effects.Reverb({
       time: 0.0001,
       decay: 0.01,
@@ -147,7 +150,7 @@ new Vue({
       this.group = new Pizzicato.Group([this.au_1, this.au_2, this.au_3, this.au_4]);
       this.isInited = true;
     },
-    //  Play Pause Music
+    // Play Loops
     playLoops() {
       this.loops.forEach(loop => {
         loop.interval = setInterval(() => {
@@ -163,6 +166,7 @@ new Vue({
 
       this.isPause = false;
     },
+    // Pause Loops
     pauseLoops() {
       this.loops.forEach(loop => {
         clearInterval(loop.interval);
@@ -294,7 +298,7 @@ new Vue({
         this.playLoops();
       }, this.loopTime);
     },
-    // Play loop
+    // Play Loop
     playLoop(loop) {
       if(loop.start) {
         console.log('Play loop')
@@ -379,6 +383,7 @@ new Vue({
         }, this.loopTime);
       }
     },
+    // Pause Loop
     pauseLoop(loop) {
       if(loop.group){
         loop.au_1.stop();
@@ -398,6 +403,22 @@ new Vue({
       };
       this.pauseLoops();
       this.playLoops();
+    },
+    // Switch metronom on/off
+    switchMetronom() {
+      if(this.isMetronom) {
+        this.metronom.stop();
+        this.isMetronom = false;
+      } else {
+        this.metronom = new Pizzicato.Sound({
+          source: 'wave',
+          options: {
+            
+          }
+        });
+        this.metronom.play();
+        this.isMetronom = true;
+      }
     }
   },
   created() {

@@ -104,8 +104,8 @@
     </div>
 
     <div class="midi-bottom">
-        <div class="metronom">
-            <img src="./assets/metronom.svg" alt="metronom">
+        <div class="metronom" @click="switchMetronom">
+            <img :src="`./assets/${isMetronom ? 'metronom-active' : 'metronom'}.svg`" alt="metronom">
         </div>
 
         <div class="filter-control">
