@@ -376,6 +376,15 @@ main {
   }
 }
 
+.metronom {
+  width: 94px;
+  height: 94px;
+  background: url('./assets/metronom.svg');
+}
+.metronom.active {
+  background: url('./assets/metronom-active.svg');
+}
+
 .effect-control {
   margin: 0 40px;
 

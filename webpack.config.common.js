@@ -5,8 +5,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
   entry: {
     index: './src/index.js',
-    vue: './src/vue.js',
-    pizzicato: './src/pizzicato.js'
   },
   output: {
     filename: '[name].[contenthash].js',
@@ -15,6 +13,7 @@ module.exports = {
   },
   plugins: [
     new CleanWebpackPlugin(),
+    
     new HtmlWebpackPlugin({
       filename: 'index.html',
       inject: true,
@@ -40,10 +39,8 @@ module.exports = {
         ],
       },
       {
-        test: /\.(png|svg|jpg|gif)$/,
-        use: [
-          'file-loader',
-        ],
+        test: /\.(png|svg|jpg|gif|wav|mp3)$/,
+        loader: 'file-loader',
       },
     ]
   },

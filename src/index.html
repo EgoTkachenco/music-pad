@@ -7,9 +7,8 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500&display=swap" rel="stylesheet">
-    <script src="vue.js"></script>
-    <script src="pizzicato.js"></script>
-    <link rel="stylesheet" href="output.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pizzicato/0.6.4/Pizzicato.min.js"></script>
 </head>
 <body>
 
@@ -104,8 +103,8 @@
     </div>
 
     <div class="midi-bottom">
-        <div class="metronom" @click="switchMetronom">
-            <img :src="`./assets/${isMetronom ? 'metronom-active' : 'metronom'}.svg`" alt="metronom">
+        <div class="metronom" :class="{ 'active': isMetronome }" @click="switchMetronome">
+
         </div>
 
         <div class="filter-control">

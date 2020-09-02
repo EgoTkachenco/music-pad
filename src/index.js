@@ -1,3 +1,22 @@
+import './main.scss';
+import bass1 from './audio/bass/bass_1.wav';
+import bass2 from './audio/bass/bass_2.wav';
+import bass3 from './audio/bass/bass_3.wav';
+import bass4 from './audio/bass/bass_4.wav';
+
+import drum1 from './audio/drum/drum_1.wav';
+import drum2 from './audio/drum/drum_2.wav';
+import drum3 from './audio/drum/drum_3.wav';
+import drum4 from './audio/drum/drum_4.wav';
+
+import piano1 from './audio/piano/piano_1.wav';
+import piano2 from './audio/piano/piano_2.wav';
+import piano3 from './audio/piano/piano_3.wav';
+import piano4 from './audio/piano/piano_4.wav';
+
+import metronomeSound from './audio/metronom.mp3';
+
+
 // Effect control view cmp
 Vue.component('effect-control-view', {
   template: '#effect-control-view-template',
@@ -84,22 +103,22 @@ new Vue({
   data: () => ({
     pads: [
         [
-          '/audio/bass/bass_1.wav', 
-          '/audio/bass/bass_2.wav', 
-          '/audio/bass/bass_3.wav', 
-          '/audio/bass/bass_4.wav'
+          bass1, 
+          bass2, 
+          bass3, 
+          bass4, 
         ],
         [
-          '/audio/drum/drum_1.wav', 
-          '/audio/drum/drum_2.wav', 
-          '/audio/drum/drum_3.wav', 
-          '/audio/drum/drum_4.wav'
+          drum1, 
+          drum2, 
+          drum3, 
+          drum4, 
         ],
         [
-          '/audio/piano/piano_1.wav', 
-          '/audio/piano/piano_2.wav', 
-          '/audio/piano/piano_3.wav', 
-          '/audio/piano/piano_4.wav'
+          piano1,
+          piano2,
+          piano3,
+          piano4,
         ],
     ],
     activePads: 0,
@@ -119,8 +138,8 @@ new Vue({
     },
     loops: [],
 
-    isMetronom: false,
-    metronom: null,
+    isMetronome: false,
+    metronome: null,
 
     reverbFilter: new Pizzicato.Effects.Reverb({
       time: 0.0001,
@@ -410,19 +429,13 @@ new Vue({
       this.playLoops();
     },
     // Switch metronom on/off
-    switchMetronom() {
-      if(this.isMetronom) {
-        this.metronom.stop();
-        this.isMetronom = false;
+    switchMetronome() {
+      if(this.isMetronome) {
+        this.metronome.stop();
+        this.isMetronome = false;
       } else {
-        this.metronom = new Pizzicato.Sound({
-          source: 'wave',
-          options: {
-            
-          }
-        });
-        this.metronom.play();
-        this.isMetronom = true;
+        this.metronome.play();
+        this.isMetronome = true;
       }
     },
     switchPads() {
@@ -451,5 +464,9 @@ new Vue({
           break;
       }
     });
+
+    this.metronome = new Pizzicato.Sound(metronomeSound);
+    this.metronome.loop = true;
+    
   }
 });
