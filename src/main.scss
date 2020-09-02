@@ -179,8 +179,11 @@ main {
       margin: auto;
     }
 
+
+    &.waiting {
+      background: red;
+    }
     &:disabled {
-      transition: all 6s;
       background: $c-grey;
     }
     &:active {

@@ -62,7 +62,7 @@ Vue.component('pad-btn', {
     },
     stopSound() {
       this.isPlay = false;
-      this.$emit('action', { key: this.keyName, play: false });
+      // this.$emit('action', { key: this.keyName, play: false });
     }
   },
   created() {
@@ -83,12 +83,32 @@ new Vue({
   el: '#midi-frame',
   data: () => ({
     pads: [
-        ['/audio/track_1.wav', '/audio/track_2.wav', '/audio/track_3.wav', '/audio/track_4.wav']
+        [
+          '/audio/bass/bass_1.wav', 
+          '/audio/bass/bass_2.wav', 
+          '/audio/bass/bass_3.wav', 
+          '/audio/bass/bass_4.wav'
+        ],
+        [
+          '/audio/drum/drum_1.wav', 
+          '/audio/drum/drum_2.wav', 
+          '/audio/drum/drum_3.wav', 
+          '/audio/drum/drum_4.wav'
+        ],
+        [
+          '/audio/piano/piano_1.wav', 
+          '/audio/piano/piano_2.wav', 
+          '/audio/piano/piano_3.wav', 
+          '/audio/piano/piano_4.wav'
+        ],
     ],
+    activePads: 0,
 
     loopTime: 4000,
     group: null,
     isInited: false,
+
+    isWantToRecord: false,
     isRecording: false,
     recordStart: null,
     record: {
@@ -132,74 +152,50 @@ new Vue({
   methods: {
     // Create Pizzicato sound file
     initSound(src) {
-      let sound = new Pizzicato.Sound(src, () => {
-        sound.loop = true;
-        sound.detached = true;
-      });
-      return sound;
+      return new Pizzicato.Sound(src);
     },
     // Start Midi Frame
-    initMidiFrame(padList) {
+    initMidiFrame() {
       let context = new AudioContext();
 
-      this.au_1 = this.initSound(this.pads[padList][0]);
-      this.au_2 = this.initSound(this.pads[padList][1]);
-      this.au_3 = this.initSound(this.pads[padList][2]);
-      this.au_4 = this.initSound(this.pads[padList][3]);
+      this.au_1 = this.initSound(this.pads[this.activePads][0]);
+      this.au_2 = this.initSound(this.pads[this.activePads][1]);
+      this.au_3 = this.initSound(this.pads[this.activePads][2]);
+      this.au_4 = this.initSound(this.pads[this.activePads][3]);
 
       this.group = new Pizzicato.Group([this.au_1, this.au_2, this.au_3, this.au_4]);
       this.isInited = true;
     },
-    // Play Loops
-    playLoops() {
-      this.loops.forEach(loop => {
-        loop.interval = setInterval(() => {
-          this.playLoop(loop);
-        }, this.loopTime);
-        this.playLoop(loop);
-      });
-
-      this.record.interval = setInterval(() => {
-        this.playLoop(this.record);
-      }, this.loopTime);
-      this.playLoop(this.record);
-
-      this.isPause = false;
-    },
-    // Pause Loops
-    pauseLoops() {
-      this.loops.forEach(loop => {
-        clearInterval(loop.interval);
-        loop.interval = null;
-        this.pauseLoop(loop);
-      });
-      clearInterval(this.record.interval);
-      this.record.interval = null;
-      this.pauseLoop(this.record);
-      this.isPause = true;
-    },
     // Handle Sound Change
     soundChange(change) {
+      let au;
       switch (change.key) {
         case 'q':
-          change.play ? this.au_1.play() : this.au_1.stop();
+          this.au_1.stop();
+          this.au_1.play();
+          au = this.au_1.clone();
           break;
         case 'w':
-          change.play ? this.au_2.play() : this.au_2.stop();
+          this.au_2.stop();
+          this.au_2.play();
+          au = this.au_2.clone();
           break;
         case 'a':
-          change.play ? this.au_3.play() : this.au_3.stop();
+          this.au_3.stop();
+          this.au_3.play();
+          au = this.au_3.clone();
           break;
         case 's':
-          change.play ? this.au_4.play() : this.au_4.stop();
+          this.au_4.stop();
+          this.au_4.play();
+          au = this.au_4.clone();
           break;
         default:
           break;
       }
       if(this.isRecording) {
         this.record.sounds.push({
-          key: change.key,
-          play: change.play,
+          au,
           time: new Date().getTime() - this.recordStart,
         })
       }
@@ -269,6 +265,14 @@ new Vue({
       console.log(this[effect][opt]);
       if(this[effect][opt] > minValues[effect]) this.group.addEffect(this[effect]);
     },
+    // Init Record 
+    initRecord() {
+      if(this.isPause) {
+        this.startRecording();
+      } else {
+        this.isWantToRecord = true;
+      }
+    },
     // Start record new Loop
     startRecording() {
       this.isRecording = true;
@@ -277,19 +281,12 @@ new Vue({
         interval: null,
         sounds: [],
         effects: [],
-        
-        au_1: this.au_1.clone(),
-        au_2: this.au_2.clone(),
-        au_3: this.au_3.clone(),
-        au_4: this.au_4.clone(),
-        
         start: {
           reverb: this.reverbFilter.time,
           delay: this.delayFilter.time,
           lowPass: this.lowPassFilter.frequency,
         }
       };
-      this.record.group =  new Pizzicato.Group([this.record.au_1, this.record.au_2, this.record.au_3, this.record.au_4]);
 
       setTimeout(() => {
         this.recordStart = null;
@@ -298,10 +295,43 @@ new Vue({
         this.playLoops();
       }, this.loopTime);
     },
+    // Play Loops
+    playLoops() {
+      this.loops.forEach(loop => {
+        loop.interval = setInterval(() => {
+          this.pauseLoop(loop);
+          this.playLoop(loop);
+        }, this.loopTime);
+        this.playLoop(loop);
+      });
+
+      this.record.interval = setInterval(() => {
+        this.pauseLoop(this.record);
+        this.playLoop(this.record);
+
+        if(this.isWantToRecord) {
+          this.isWantToRecord = false;
+          this.startRecording();
+        }
+      }, this.loopTime);
+      this.playLoop(this.record);
+      this.isPause = false;
+    },
+    // Pause Loops
+    pauseLoops() {
+      this.loops.forEach(loop => {
+        clearInterval(loop.interval);
+        loop.interval = null;
+        this.pauseLoop(loop);
+      });
+      clearInterval(this.record.interval);
+      this.record.interval = null;
+      this.pauseLoop(this.record);
+      this.isPause = true;
+    },
     // Play Loop
     playLoop(loop) {
       if(loop.start) {
-        console.log('Play loop')
         // Init effects for loop 
         let reverb = new Pizzicato.Effects.Reverb({
           time: loop.start.reverb,
@@ -324,6 +354,8 @@ new Vue({
           'delay': 0,
           'lowPass': 10
         };
+
+        loop.group = new Pizzicato.Group(loop.sounds.map(i => i.au.clone()));
 
         if(reverb.time > minValues.reverb) loop.group.addEffect(reverb);
         if(delay.time > minValues.delay) loop.group.addEffect(delay);
@@ -353,43 +385,16 @@ new Vue({
             }
           }, item.time);
         });
-        loop.sounds.forEach(item => {
-          setTimeout(() => {
-            console.log('sound')
-            switch (item.key) {
-              case 'q':
-                item.play ? loop.au_1.play() : loop.au_1.stop();
-                break;
-              case 'w':
-                item.play ? loop.au_2.play() : loop.au_2.stop();
-                break;
-              case 'a':
-                item.play ? loop.au_3.play() : loop.au_3.stop();
-                break;
-              case 's':
-                item.play ? loop.au_4.play() : loop.au_4.stop();
-                break;
-              default:
-                break;
-            }
-          }, item.time);
+        loop.group.sounds.forEach((s, i) => {
+            s.play(loop.sounds[i].time / 1000);
         });
-        // Loop end -> stop all sounds
-        setTimeout(() => {
-          loop.group.removeEffect(reverb);
-          loop.group.removeEffect(delay);
-          loop.group.removeEffect(lowPass);
-          this.pauseLoop(loop);
-        }, this.loopTime);
       }
     },
     // Pause Loop
     pauseLoop(loop) {
       if(loop.group){
-        loop.au_1.stop();
-        loop.au_2.stop();
-        loop.au_3.stop();
-        loop.au_4.stop();
+        loop.group.sounds.forEach(s => {s.stop()});
+        loop.group = null;
       }
     },
     // Save loop and start new one
@@ -419,6 +424,14 @@ new Vue({
         this.metronom.play();
         this.isMetronom = true;
       }
+    },
+    switchPads() {
+      if(this.activePads === this.pads.length - 1) {
+        this.activePads = 0;
+      } else {
+        this.activePads++;
+      }
+      this.initMidiFrame();
     }
   },
   created() {
@@ -426,7 +439,7 @@ new Vue({
       switch(event.keyCode) {
         // Arrow top
         case 38:
-          this.startRecording();
+          this.initRecord();
           break;
         // Arrow right
         case 37:

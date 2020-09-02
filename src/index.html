@@ -56,7 +56,7 @@
         </div>
 
         <div class="control">
-            <button class="control-btn" @click="startRecording" :disabled="isRecording">
+            <button class="control-btn" @click="initRecord" :class="{'waiting': isWantToRecord}" :disabled="isRecording">
                 <div class="control-btn-img"></div>
             </button>
             <div class="control-btn-label">rec</div>
@@ -79,7 +79,7 @@
         <div class="midi-frame__right">
             <div class="midi-frame__right-top">
                 <div>
-                    <button class="control-btn">
+                    <button class="control-btn" @click="switchPads">
                         <div class="control-btn-img" style="transform: rotate(270deg)"></div>
                     </button>
                     <div class="control-btn-label">swap pads</div>

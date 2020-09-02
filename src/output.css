@@ -163,8 +163,10 @@ main {
   height: 23px;
   margin: auto;
 }
+.control-btn.waiting {
+  background: red;
+}
 .control-btn:disabled {
-  transition: all 6s;
   background: #ACACAC;
 }
 .control-btn:active {
