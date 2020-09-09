@@ -6,7 +6,7 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500&display=swap" rel="stylesheet">
+    <!-- <link href="" rel="stylesheet"> -->
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pizzicato/0.6.4/Pizzicato.min.js"></script>
 </head>
@@ -18,10 +18,10 @@
             <div class="help-dialog__title">Keyboard Instruction</div>
 
             <div class="help-dialog__btns">
-                <div class="help-dialog__btns-item">q</div>
-                <div class="help-dialog__btns-item">w</div>
-                <div class="help-dialog__btns-item">a</div>
-                <div class="help-dialog__btns-item">d</div>
+                <div class="help-dialog__btns-item">Q</div>
+                <div class="help-dialog__btns-item">W</div>
+                <div class="help-dialog__btns-item">A</div>
+                <div class="help-dialog__btns-item">D</div>
             </div>
 
             <div class="help-dialog__label">to activate pads</div>
@@ -40,6 +40,15 @@
             <div class="help-dialog__label">to change effects</div>
 
             <div class="help-dialog__line"></div>
+
+            <div class="help-dialog__btns">
+                <div class="help-dialog__btns-item">M</div>
+            </div>
+
+            <div class="help-dialog__label">to switch metronome</div>
+
+            <div class="help-dialog__line"></div>
+
 
             <button class="help-dialog__init-btn" @click="initMidiFrame(0)">Start</button>
 
@@ -103,28 +112,29 @@
     </div>
 
     <div class="midi-bottom">
-        <div class="metronom" :class="{ 'active': isMetronome }" @click="switchMetronome">
-
+        <div class="metronom-wrapper">
+            <div class="metronom" :class="{ 'active': isMetronome }" @click="switchMetronome"></div>
+            <div class="text">M</div>
         </div>
 
         <div class="filter-control">
             <effect-control effect-name="Reverb"
-                                 :level="reverbLevel"
-                                 key-up="2"
-                                 key-down="1"
-                                 @action="effectChange($event)">
+                            :level="reverbLevel"
+                            key-up="2"
+                            key-down="1"
+                            @action="effectChange($event)">
             </effect-control>
             <effect-control effect-name="Delay"
-                                 :level="delayLevel"
-                                 key-up="4"
-                                 key-down="3"
-                                 @action="effectChange($event)">
+                            :level="delayLevel"
+                            key-up="4"
+                            key-down="3"
+                            @action="effectChange($event)">
             </effect-control>
             <effect-control effect-name="Low Pass"
-                                 :level="lowPassLevel"
-                                 key-up="6"
-                                 key-down="5"
-                                 @action="effectChange($event)">
+                            :level="lowPassLevel"
+                            key-up="6"
+                            key-down="5"
+                            @action="effectChange($event)">
             </effect-control>
         </div>
     </div>
@@ -147,7 +157,7 @@
             </div>
         </div>
 
-        <div class="effects-control__item-title">{{effectName}}</div>
+        <div class="effect-control__item-title">{{effectName}}</div>
     </div>
 </template>
 

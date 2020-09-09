@@ -6,6 +6,8 @@ $c-grey: #ACACAC;
 $lg: 1700px;
 $md: 1300px;
 
+@import url("https://cdn.rawgit.com/h-ibaldo/Raleway_Fixed_Numerals/master/css/rawline.css");
+
 body {
   margin: 0;
 }
@@ -13,7 +15,8 @@ body {
 main {
   background: #000000;
   padding: 100px 40px;
-  font-family: 'Raleway', sans-serif;
+  font-family: "rawline", sans-serif;
+  
   position: relative;
 
   @media (max-width: $md) {
@@ -124,6 +127,7 @@ main {
   align-content: center;
 
   &-btn {
+    font-family: 'rawline', sans-serif;
     background: #000000;
     border-radius: 3px;
     margin: 7.5px;
@@ -197,6 +201,7 @@ main {
   &-btn-label {
     text-align: center;
     color: $c-blue;
+    font-weight: 500;
   }
 
   &-line {
@@ -264,6 +269,7 @@ main {
 
   &-title {
     color: $c-blue;
+    font-weight: 500;
     margin-top: 10px;
   }
   &-controller {
@@ -376,14 +382,25 @@ main {
   }
 }
 
-.metronom {
-  width: 94px;
-  height: 94px;
-  background: url('./assets/metronom.svg');
+.metronom-wrapper {
+  text-align: center;
+  .metronom {
+    width: 94px;
+    height: 94px;
+    background: url('./assets/metronom.svg');
+  }
+  .metronom.active {
+    background: url('./assets/metronom-active.svg');
+  }
+
+  .text {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #ACACAC;
+    display: inline-block;
+  }
 }
-.metronom.active {
-  background: url('./assets/metronom-active.svg');
-}
+
 
 .effect-control {
   margin: 0 40px;

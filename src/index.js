@@ -124,6 +124,7 @@ new Vue({
     activePads: 0,
 
     loopTime: 4000,
+    loopsInterval: null,
     group: null,
     isInited: false,
 
@@ -175,7 +176,9 @@ new Vue({
     },
     // Start Midi Frame
     initMidiFrame() {
-      let context = new AudioContext();
+      if(!this.isInited) {
+        let context = new AudioContext();
+      }
 
       this.au_1 = this.initSound(this.pads[this.activePads][0]);
       this.au_2 = this.initSound(this.pads[this.activePads][1]);
@@ -183,6 +186,7 @@ new Vue({
       this.au_4 = this.initSound(this.pads[this.activePads][3]);
 
       this.group = new Pizzicato.Group([this.au_1, this.au_2, this.au_3, this.au_4]);
+      
       this.isInited = true;
     },
     // Handle Sound Change
@@ -213,6 +217,10 @@ new Vue({
           break;
       }
       if(this.isRecording) {
+        // au = this.setEffect('reverbFilter', 0, au);
+        // au = this.setEffect('delayFilter', 0, au);
+        // au = this.setEffect('lowPassFilter', 0, au);
+
         this.record.sounds.push({
           au,
           time: new Date().getTime() - this.recordStart,
@@ -225,30 +233,30 @@ new Vue({
       switch (change.effect) {
         case 'Reverb':
           if(change.type === 'up' && this.reverbLevel < 10) {
-            this.setEffect('reverbFilter', 9.9999 / 11);
+            this.setEffect('reverbFilter', 9.9999 / 11, this.group);
             this.reverbLevel++;
           } else if(change.type === 'down' && this.reverbLevel > 0) {
-            this.setEffect('reverbFilter', -9.9999 / 11);
+            this.setEffect('reverbFilter', -9.9999 / 11, this.group);
             this.reverbLevel--;
           }
           value = this.reverbFilter.time;
           break;
         case 'Delay':
           if(change.type === 'up' && this.delayLevel < 10) {
-            this.setEffect('delayFilter', 1 / 11);
+            this.setEffect('delayFilter', 1 / 11, this.group);
             this.delayLevel++;
           } else if(change.type === 'down' && this.delayLevel > 0) {
-            this.setEffect('delayFilter', -1 / 11);
+            this.setEffect('delayFilter', -1 / 11, this.group);
             this.delayLevel--;
           }
           value = this.delayFilter.time;
           break;
         case 'Low Pass':
           if(change.type === 'up' && this.lowPassLevel < 10) {
-            this.setEffect('lowPassFilter', 22040 / 11);
+            this.setEffect('lowPassFilter', 22040 / 11, this.group);
             this.lowPassLevel++;
           } else if(change.type === 'down' && this.lowPassLevel > 0) {
-            this.setEffect('lowPassFilter', -22040 / 11);
+            this.setEffect('lowPassFilter', -22040 / 11, this.group);
             this.lowPassLevel--;
           }
           value = this.lowPassFilter.frequency;
@@ -265,7 +273,7 @@ new Vue({
       }
     },
     // CHANGE TIME FOR REVERB AND DELAY AND FREQUENCY FOR LOWPASS
-    setEffect(effect, step) {
+    setEffect(effect, step, au) {
       let minValues = {
         'reverbFilter': 0.0001,
         'delayFilter': 0,
@@ -277,12 +285,12 @@ new Vue({
         'lowPassFilter': 0
       };
       let opt = effect === 'lowPassFilter' ? 'frequency' : 'time';
-      if(this[effect][opt] > minValues[effect]) this.group.removeEffect(this[effect]);
+      if(this[effect][opt] > minValues[effect]) au.removeEffect(this[effect]);
       let val = (this[effect][opt] + step);
       this[effect][opt] = Number(val.toFixed(fixedNums[effect]));
       this[effect][opt] = {...this[effect][opt]};
-      console.log(this[effect][opt]);
-      if(this[effect][opt] > minValues[effect]) this.group.addEffect(this[effect]);
+      if(this[effect][opt] > minValues[effect]) au.addEffect(this[effect]);
+      return au;
     },
     // Init Record 
     initRecord() {
@@ -316,36 +324,27 @@ new Vue({
     },
     // Play Loops
     playLoops() {
-      this.loops.forEach(loop => {
-        loop.interval = setInterval(() => {
-          this.pauseLoop(loop);
-          this.playLoop(loop);
-        }, this.loopTime);
-        this.playLoop(loop);
-      });
-
-      this.record.interval = setInterval(() => {
-        this.pauseLoop(this.record);
-        this.playLoop(this.record);
-
+      let action = () => {
         if(this.isWantToRecord) {
           this.isWantToRecord = false;
           this.startRecording();
+        } else if(this.record) {
+          this.playLoop(this.record);
         }
-      }, this.loopTime);
-      this.playLoop(this.record);
+        this.loops.forEach(loop => this.playLoop(loop));
+      }
+      this.loopsInterval = setInterval(() => action(), this.loopTime);
+      action();
       this.isPause = false;
     },
     // Pause Loops
     pauseLoops() {
-      this.loops.forEach(loop => {
-        clearInterval(loop.interval);
-        loop.interval = null;
-        this.pauseLoop(loop);
-      });
-      clearInterval(this.record.interval);
-      this.record.interval = null;
+      clearInterval(this.loopsInterval);
+      this.loopsInterval = null;
+      
+      this.loops.forEach(loop => this.pauseLoop(loop));
       this.pauseLoop(this.record);
+      
       this.isPause = true;
     },
     // Play Loop
@@ -383,6 +382,7 @@ new Vue({
         loop.effects.forEach(item => {
           setTimeout(() => {
             console.log('effect')
+            console.log(item.key)
             switch (item.key) {
               case 'Reverb':
                 if(reverb.time > minValues.reverb) loop.group.removeEffect(reverb);
@@ -394,7 +394,7 @@ new Vue({
                 delay.time = item.value;
                 if(delay.time > minValues.delay) loop.group.addEffect(delay);
                 break;
-              case 'lowPass':
+              case 'Low Pass':
                 if(lowPass.frequency > minValues.lowPass) loop.group.removeEffect(lowPass);
                 lowPass.frequency = Number(item.value);
                 if(lowPass.frequency > minValues.lowPass) loop.group.addEffect(lowPass);
@@ -405,7 +405,7 @@ new Vue({
           }, item.time);
         });
         loop.group.sounds.forEach((s, i) => {
-            s.play(loop.sounds[i].time / 1000);
+          s.play(loop.sounds[i].time / 1000);
         });
       }
     },
@@ -418,6 +418,7 @@ new Vue({
     },
     // Save loop and start new one
     startNewLoop() {
+      this.pauseLoops();
       this.loops.push(this.record);
       this.record = {
         interval: null,
@@ -425,7 +426,6 @@ new Vue({
         effects: [],
         start: null
       };
-      this.pauseLoops();
       this.playLoops();
     },
     // Switch metronom on/off
@@ -438,6 +438,7 @@ new Vue({
         this.isMetronome = true;
       }
     },
+    // Change pads 
     switchPads() {
       if(this.activePads === this.pads.length - 1) {
         this.activePads = 0;
@@ -448,25 +449,27 @@ new Vue({
     }
   },
   created() {
-    window.addEventListener('keydown', event => {
-      switch(event.keyCode) {
-        // Arrow top
-        case 38:
-          this.initRecord();
-          break;
-        // Arrow right
-        case 37:
-          this.isPause ? this.playLoops() : this.pauseLoops();
-          break;
-        // Arrow down
-        case 40:
-          this.startNewLoop();
-          break;
-      }
-    });
-
     this.metronome = new Pizzicato.Sound(metronomeSound);
     this.metronome.loop = true;
-    
+    // Listen to key press
+    window.addEventListener('keydown', event => {
+      switch(event.key) {
+        case 'ArrowUp':
+          this.initRecord();
+          break;
+        case 'ArrowRight':
+          this.isPause ? this.playLoops() : this.pauseLoops();
+          break;
+        case 'ArrowDown':
+          this.startNewLoop();
+          break;
+        case 'ArrowLeft':
+          this.switchPads();
+          break;
+        case 'm':
+          this.switchMetronome();
+          break;
+      }
+    }); 
   }
 });
