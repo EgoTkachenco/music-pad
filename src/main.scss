@@ -3,7 +3,7 @@ $c-pink: #FF00FF;
 $c-dark-grey: #4F4F4F;
 $c-grey: #ACACAC;
 
-$lg: 1700px;
+$lg: 1520px;
 $md: 1300px;
 
 @import url("https://cdn.rawgit.com/h-ibaldo/Raleway_Fixed_Numerals/master/css/rawline.css");
@@ -101,7 +101,12 @@ main {
   max-width: 1450px;
   height: 346px;
   margin: auto;
-  padding: 0 5% 0 11%;
+  padding: 0 100px 0 170px;
+  box-sizing: border-box;
+
+  @media (max-width: $lg) {
+    // padding: 27px 5% 27px 100px;
+  }
 
   .midi-frame-bg {
     top: 0;
@@ -122,9 +127,10 @@ main {
   z-index: 2;
   display: flex;
   flex-wrap: wrap;
-  flex: 0 1 30%;
   justify-content: center;
   align-content: center;
+  padding: 27px 0;
+  width: 30%;
 
   &-btn {
     font-family: 'rawline', sans-serif;
@@ -138,19 +144,21 @@ main {
     border: 0;
     outline: none;
     cursor: pointer;
-    flex: 0 1 calc(50% - 30px);
-
+    width: 136px;
+    height: 136px;
+    // width: 44%;
+    // height: 47%;
     @media (max-width: $lg) {
       font-size: 40px;
       width: 120px;
       height: 120px;
     }
 
-    @media (max-width: $md) {
-      font-size: 36px;
-      width: 100px;
-      height: 100px;
-    }
+    // @media (max-width: $md) {
+    //   font-size: 36px;
+    //   width: 100px;
+    //   height: 100px;
+    // }
 
     &.active {
       box-shadow: inset 1px 1px 10px 3px #1A14FA;
@@ -161,10 +169,10 @@ main {
 
 .control {
   z-index: 2;
-  padding: 10px 15px 5px;
+  padding: 32px 15px 5px;
   border-left: 1px solid #DBDBDB;
   border-right: 1px solid #DBDBDB;
-  flex: 0 1 5%;
+  width: 9%;
 
   &-btn {
     width: 100%;
@@ -175,6 +183,9 @@ main {
     outline: none;
     cursor: pointer;
     margin-top: 7.5px;
+    color: $c-pink;
+    font-weight: 500;
+    font-size: 24px;
 
     &-img {
       background: url("./assets/arrow-top.svg") center no-repeat;
@@ -206,7 +217,7 @@ main {
 
   &-line {
     width: 0;
-    height: 52px;
+    height: 11%;
     margin: 5px auto 0;
     border: 1px solid #000000;
   }
@@ -216,8 +227,7 @@ main {
   z-index: 2;
   display: flex;
   flex-direction: column;
-  flex: 0 1 65%;
-
+  width: 58%;
   &-top {
     display: flex;
     align-items: flex-start;
@@ -262,15 +272,21 @@ main {
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 20%;
 
   &:nth-child(2) {
     margin: 0 30px;
+  }
+
+  @media (max-width: $lg) {
+    width: 120px;
   }
 
   &-title {
     color: $c-blue;
     font-weight: 500;
     margin-top: 10px;
+    text-transform: lowercase;
   }
   &-controller {
     width: 126px;
@@ -376,9 +392,8 @@ main {
   margin-top: 30px;
 
   .filter-control{
-    margin-left: auto;
+    margin-left: 38.5%;
     display: flex;
-    padding-bottom: 10px;
   }
 }
 
@@ -403,12 +418,17 @@ main {
 
 
 .effect-control {
-  margin: 0 40px;
+  width: 160px;
+ 
+  &:nth-child(2) {
+    margin: 0 50px;
+  }
 
   &-level {
     height: 57px;
     display: flex;
     align-items: flex-end;
+    justify-content: flex-end;
     margin-bottom: 18px;
 
     &__line {
@@ -437,6 +457,7 @@ main {
       border: 1px solid $c-pink;
       background: none;
       color: $c-pink;
+      text-transform: uppercase;
 
 
       &.active {
