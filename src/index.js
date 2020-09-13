@@ -46,18 +46,18 @@ Vue.component('effect-control', {
   },
   created() {
     window.addEventListener('keydown', event => {
-      if(event.key === this.keyDown && !this.filterChangeInterval) {
+      if(event.key === this.keyDown && !this.filterChangeInterval || event.key === this.keyDown.toUpperCase() && !this.filterChangeInterval) {
         this.isDown = true;
         this.changeDown();
         this.filterChangeInterval = setInterval(this.changeDown, this.filterChangeIntervalTime);
-      } else if(event.key === this.keyUp && !this.filterChangeInterval) {
+      } else if(event.key === this.keyUp && !this.filterChangeInterval || event.key === this.keyUp.toUpperCase() && !this.filterChangeInterval) {
         this.isUp = true;
         this.changeUp();
         this.filterChangeInterval = setInterval(this.changeUp, this.filterChangeIntervalTime);
       }
     });
     window.addEventListener('keyup', event => {
-      if(event.key === this.keyDown || event.key === this.keyUp) {
+      if(event.key === this.keyDown || event.key === this.keyUp || event.key === this.keyDown.toUpperCase() || event.key === this.keyUp.toUpperCase()) {
         clearInterval(this.filterChangeInterval);
         this.isUp = false;
         this.isDown = false;
@@ -86,12 +86,12 @@ Vue.component('pad-btn', {
   },
   created() {
     window.addEventListener('keydown', event => {
-      if(event.key === this.keyName && !this.isPlay) {
+      if(event.key === this.keyName && !this.isPlay || event.key === this.keyName.toUpperCase() && !this.isPlay) {
         this.playSound();
       }
     });
     window.addEventListener('keyup', event => {
-      if(event.key === this.keyName && this.isPlay) {
+      if(event.key === this.keyName && this.isPlay || event.key === this.keyName.toUpperCase() && this.isPlay) {
         this.stopSound();
       }
     });
@@ -178,9 +178,14 @@ new Vue({
       this.au_4 = this.initSound(this.pads[this.activePads][3]);
   
       if(!this.isInited) {
+        console.log('Inited')
         let context = new AudioContext();
         this.group = new Pizzicato.Group([this.au_1, this.au_2, this.au_3, this.au_4]);
         this.isInited = true;
+      } else {
+        let effects = this.group.effects;
+        this.group = new Pizzicato.Group([this.au_1, this.au_2, this.au_3, this.au_4]);
+        effects.forEach(eff => this.group.addEffect(eff));
       }
     },
     // Handle Sound Change
@@ -211,6 +216,20 @@ new Vue({
           break;
       }
       if(this.isRecording) {
+        this.group.effects.forEach(eff => {
+          let effect;
+          if(eff.reverbNode) {
+            effect =  new Pizzicato.Effects.Reverb({...eff.options});
+          } else if(eff.delayNode) {
+            effect =  new Pizzicato.Effects.Delay({...eff.options});
+          } else {
+            effect =  new Pizzicato.Effects.LowPassFilter({
+              frequency: eff.frequency,
+              peak: eff.peak
+            });
+          }
+          au.addEffect(effect)
+        });
         this.record.sounds.push({
           au,
           time: new Date().getTime() - this.recordStart,
@@ -223,33 +242,27 @@ new Vue({
         case 'Reverb':
           if(change.type === 'up' && this.reverbLevel < 10) {
             this.setEffect('reverbFilter', 3 / 10, this.group);
-            this.setEffect('reverbFilter', 0, this.loopsGroup);
             this.reverbLevel++;
           } else if(change.type === 'down' && this.reverbLevel > 0) {
             this.setEffect('reverbFilter', -3 / 10, this.group);
-            this.setEffect('reverbFilter', 0, this.loopsGroup);
             this.reverbLevel--;
           }
           break;
         case 'Delay':
           if(change.type === 'up' && this.delayLevel < 10) {
             this.setEffect('delayFilter', 1 / 10, this.group);
-            this.setEffect('delayFilter', 0, this.loopsGroup);
             this.delayLevel++;
           } else if(change.type === 'down' && this.delayLevel > 0) {
             this.setEffect('delayFilter', -1 / 10, this.group);
-            this.setEffect('delayFilter', 0, this.loopsGroup);
             this.delayLevel--;
           }
           break;
         case 'Low Pass':
           if(change.type === 'up' && this.lowPassLevel < 10) {
             this.setEffect('lowPassFilter', -300, this.group);
-            this.setEffect('lowPassFilter', 0, this.loopsGroup);
             this.lowPassLevel++;
           } else if(change.type === 'down' && this.lowPassLevel > 0) {
             this.setEffect('lowPassFilter', 300, this.group);
-            this.setEffect('lowPassFilter', 0, this.loopsGroup);
             this.lowPassLevel--;
           }
           break;
@@ -276,13 +289,15 @@ new Vue({
       this[effect][opt] = Number(val.toFixed(fixedNums[effect]));
       this[effect][opt] = {...this[effect][opt]};
 
-      if(this[effect][opt] >= minValues[effect] && effect !== 'lowPassFilter' || effect === 'lowPassFilter' && this[effect][opt] < minValues[effect]) {
+      if(this[effect][opt] > minValues[effect] && effect !== 'lowPassFilter' || effect === 'lowPassFilter' && this[effect][opt] < minValues[effect]) {
         au.addEffect(this[effect]);
+        console.log('Effect ', effect)
       }
     },
     // Init Record 
     initRecord() {
       if(this.isPause) {
+        this.playLoops();
         this.startRecording();
       } else {
         this.isWantToRecord = true;
@@ -342,14 +357,13 @@ new Vue({
     },
     // Switch metronom on/off
     switchMetronome() {
-      // if(this.isMetronome) {
-      //   this.metronome.stop();
-      //   this.isMetronome = false;
-      // } else {
-      //   this.metronome.play();
-      //   this.isMetronome = true;
-      // }
-      debugger
+      if(this.isMetronome) {
+        this.metronome.stop();
+        this.isMetronome = false;
+      } else {
+        this.metronome.play();
+        this.isMetronome = true;
+      }
     },
     // Change pads 
     switchPads() {
@@ -363,23 +377,41 @@ new Vue({
   },
   created() {
     this.metronome = new Pizzicato.Sound(metronomeSound);
+    this.metronome.volume = 0.1;
     this.metronome.loop = true;
+
+    // this.loopsGroup.volume = 0.75;
     // Listen to key press
     window.addEventListener('keydown', event => {
       switch(event.key) {
         case 'c':
           this.initRecord();
           break;
+        case 'C':
+          this.initRecord();
+          break;
         case 'r':
+          this.isPause ? this.playLoops() : this.pauseLoops();
+          break;
+        case 'R':
           this.isPause ? this.playLoops() : this.pauseLoops();
           break;
         case 'd':
           this.clearLoop();
           break;
+        case 'D':
+          this.clearLoop();
+          break;
         case 'e':
           this.switchPads();
           break;
+        case 'E':
+          this.switchPads();
+          break;
         case 'm':
+          this.switchMetronome();
+          break;
+        case 'M':
           this.switchMetronome();
           break;
       }

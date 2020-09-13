@@ -49,45 +49,54 @@
 
             <div class="help-dialog__line"></div>
 
+            <div class="help-dialog__keyboard"></div>
 
             <button class="help-dialog__init-btn" @click="initMidiFrame(0)">Start</button>
 
         </div>
     </div>
+
+    <div class="title">Test it out!</div>
+    <div class="subtitle">That's just a sneak peek of what you can do with it: The real Jammy MIDI frame has fully <br> programmable controls that you can map however you want, giving you immense possibilities.</div>
+
     <div class="midi-frame">
         <div class="pads">
-            <pad-btn key-name="q" @action="soundChange($event)"></pad-btn>
-            <pad-btn key-name="w" @action="soundChange($event)"></pad-btn>
-            <pad-btn key-name="a" @action="soundChange($event)"></pad-btn>
-            <pad-btn key-name="s" @action="soundChange($event)"></pad-btn>
+            <div class="pads-line">
+                <pad-btn key-name="q" @action="soundChange($event)"></pad-btn>
+                <pad-btn key-name="w" @action="soundChange($event)"></pad-btn>
+            </div>
+            <div class="pads-line">
+                <pad-btn key-name="a" @action="soundChange($event)"></pad-btn>
+                <pad-btn key-name="s" @action="soundChange($event)"></pad-btn>
+            </div>
         </div>
 
         <div class="control">
             <button class="control-btn" @click="switchPads">
-                B1
+                E
             </button>
             <div class="control-btn-label">swap pads</div>
 
             <div class="control-line"></div>
 
             <button class="control-btn" @click="clearLoop">
-                B2
+                D
             </button>
             <div class="control-btn-label">clear loop</div>
 
             <div class="control-line"></div>
 
             <button class="control-btn" @click="initRecord" :class="{'waiting': isWantToRecord}" :disabled="isRecording">
-                B3
+                C
             </button>
             <div class="control-btn-label">rec</div>
         </div>
 
         <div class="midi-frame__right">
             <div class="midi-frame__right-top">
-                <div>
+                <div class="midi-frame__right-top__btn">
                     <button class="control-btn" @click="isPause ? playLoops() : pauseLoops()">
-                        B4
+                        R
                     </button>
                     <div class="control-btn-label">play/stop</div>
                 </div>
@@ -98,44 +107,46 @@
                 </div>
             </div>
             <div class="filter-control">
-                <effect-control-view effect-name="Reverb" :level="reverbLevel">
-                </effect-control-view>
-                <effect-control-view effect-name="Delay" :level="delayLevel">
-                </effect-control-view>
-                <effect-control-view effect-name="Low Pass" :level="lowPassLevel">
-                </effect-control-view>
+                <div class="filter-control-item">
+                    <effect-control-view effect-name="Reverb" :level="reverbLevel">
+                    </effect-control-view>
+                    <effect-control effect-name="Reverb"
+                                    :level="reverbLevel"
+                                    key-up="g"
+                                    key-down="f"
+                                    @action="effectChange($event)">
+                    </effect-control>
+                </div>
+                <div class="filter-control-item">
+                    <effect-control-view effect-name="Delay" :level="delayLevel">
+                    </effect-control-view>
+                    <effect-control effect-name="Delay"
+                                    :level="delayLevel"
+                                    key-up="j"
+                                    key-down="h"
+                                    @action="effectChange($event)">
+                    </effect-control>
+                </div>
+                <div class="filter-control-item">
+                    <effect-control-view effect-name="Low Pass" :level="lowPassLevel">
+                    </effect-control-view>
+                    <effect-control effect-name="Low Pass"
+                                    :level="lowPassLevel"
+                                    key-up="l"
+                                    key-down="k"
+                                    @action="effectChange($event)">
+                    </effect-control>
+                </div>
             </div>
         </div>
 
         <div class="midi-frame-bg"></div>
-    </div>
-
-    <div class="midi-bottom">
+        
         <div class="metronom-wrapper">
             <div class="metronom" :class="{ 'active': isMetronome }" @click="switchMetronome"></div>
             <div class="text">M</div>
         </div>
-
-        <div class="filter-control">
-            <effect-control effect-name="Reverb"
-                            :level="reverbLevel"
-                            key-up="g"
-                            key-down="f"
-                            @action="effectChange($event)">
-            </effect-control>
-            <effect-control effect-name="Delay"
-                            :level="delayLevel"
-                            key-up="j"
-                            key-down="h"
-                            @action="effectChange($event)">
-            </effect-control>
-            <effect-control effect-name="Low Pass"
-                            :level="lowPassLevel"
-                            key-up="l"
-                            key-down="k"
-                            @action="effectChange($event)">
-            </effect-control>
-        </div>
+    
     </div>
 </main>
 
@@ -172,10 +183,18 @@
         <div class="effect-control-btns">
             <button class="effect-control-btn"
                     @click="changeDown"
-                    :class="{'active': isDown}">{{keyDown}}</button>
+                    :class="{'active': isDown}">
+                <div>
+                    {{keyDown}}
+                </div>    
+            </button>
             <button class="effect-control-btn"
                     @click="changeUp"
-                    :class="{'active': isUp}">{{keyUp}}</button>
+                    :class="{'active': isUp}">
+                <div>
+                    {{keyUp}}
+                </div>
+            </button>
         </div>
         <!-- <div class="effect-control-title">{{effectName}}</div> -->
     </div>
@@ -187,7 +206,9 @@
             :class="{'active': isPlay}"
             @mouseup="stopSound"
             @mousedown="playSound"
-    >{{keyName}}</button>
+    >
+    <div>{{keyName}}</div>
+</button>
 </template>
 
 
