@@ -308,6 +308,11 @@ new Vue({
       this.isRecording = true;
       this.recordStart = new Date().getTime();
       this.record = { sounds: [] };
+      
+      if(this.isMetronome) {
+        this.switchMetronome();
+        this.switchMetronome();
+      }
 
       setTimeout(() => {
         this.loops.push(this.record)
