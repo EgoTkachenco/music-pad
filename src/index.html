@@ -1,217 +1,250 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Document</title>
     <!-- <link href="" rel="stylesheet"> -->
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pizzicato/0.6.4/Pizzicato.min.js"></script>
-</head>
-<body>
-
-<main id="midi-frame">
-    <div class="help-wrapper" v-if="!isInited">
+  </head>
+  <body>
+    <main id="midi-frame" @click.once="initMidiFrame(0)">
+      <div class="help-wrapper" v-if="!isInited">
         <div class="help-dialog">
-            <div class="help-dialog__title">Keyboard Instruction</div>
+          <div class="help-dialog__title">Keyboard Instruction</div>
 
-            <div class="help-dialog__btns">
-                <div class="help-dialog__btns-item">Q</div>
-                <div class="help-dialog__btns-item">W</div>
-                <div class="help-dialog__btns-item">A</div>
-                <div class="help-dialog__btns-item">D</div>
-            </div>
+          <div class="help-dialog__btns">
+            <div class="help-dialog__btns-item">Q</div>
+            <div class="help-dialog__btns-item">W</div>
+            <div class="help-dialog__btns-item">A</div>
+            <div class="help-dialog__btns-item">D</div>
+          </div>
 
-            <div class="help-dialog__label">to activate pads</div>
+          <div class="help-dialog__label">to activate pads</div>
 
-            <div class="help-dialog__line"></div>
+          <div class="help-dialog__line"></div>
 
-            <div class="help-dialog__btns">
-                <div class="help-dialog__btns-item">F</div>
-                <div class="help-dialog__btns-item">G</div>
-                <div class="help-dialog__btns-item">H</div>
-                <div class="help-dialog__btns-item">J</div>
-                <div class="help-dialog__btns-item">K</div>
-                <div class="help-dialog__btns-item">L</div>
-            </div>
+          <div class="help-dialog__btns">
+            <div class="help-dialog__btns-item blue">F</div>
+            <div class="help-dialog__btns-item blue">G</div>
+            <div class="help-dialog__btns-item blue">H</div>
+            <div class="help-dialog__btns-item blue">J</div>
+            <div class="help-dialog__btns-item blue">K</div>
+            <div class="help-dialog__btns-item blue">L</div>
+          </div>
 
-            <div class="help-dialog__label">to change effects</div>
+          <div class="help-dialog__label">to change effects</div>
 
-            <div class="help-dialog__line"></div>
+          <div class="help-dialog__line"></div>
 
-            <div class="help-dialog__btns">
-                <div class="help-dialog__btns-item">M</div>
-            </div>
+          <div class="help-dialog__btns">
+            <div class="help-dialog__btns-item yellow">E</div>
+            <div class="help-dialog__btns-item yellow">R</div>
+            <div class="help-dialog__btns-item yellow">D</div>
+            <div class="help-dialog__btns-item yellow">C</div>
+          </div>
+          <div class="help-dialog__label">for transport buttons</div>
+          <div class="help-dialog__line"></div>
 
-            <div class="help-dialog__label">to switch metronome</div>
+          <!-- <div class="help-dialog__btns">
+                    <div class="help-dialog__btns-item">M</div>
+                </div>
+    
+                <div class="help-dialog__label">to switch metronome</div>
+    
+                <div class="help-dialog__line"></div> -->
 
-            <div class="help-dialog__line"></div>
+          <div class="help-dialog__keyboard"></div>
 
-            <div class="help-dialog__keyboard"></div>
-
-            <button class="help-dialog__init-btn" @click="initMidiFrame(0)">Start</button>
-
+          <button class="help-dialog__init-btn" @click="initMidiFrame(0)">
+            Start
+          </button>
         </div>
-    </div>
+      </div>
 
-    <div class="title">Test it out!</div>
-    <div class="subtitle">That's just a sneak peek of what you can do with it: The real Jammy MIDI frame has fully <br> programmable controls that you can map however you want, giving you immense possibilities.</div>
+      <div class="title">Test it out!</div>
+      <div class="subtitle">
+        That's just a sneak peek of what you can do with it: The real Jammy MIDI
+        frame has fully <br />
+        programmable controls that you can map however you want, giving you
+        immense possibilities.
+      </div>
 
-    <div class="midi-frame">
+      <div class="midi-frame">
         <div class="pads">
-            <div class="pads-line">
-                <pad-btn key-name="q" @action="soundChange($event)"></pad-btn>
-                <pad-btn key-name="w" @action="soundChange($event)"></pad-btn>
-            </div>
-            <div class="pads-line">
-                <pad-btn key-name="a" @action="soundChange($event)"></pad-btn>
-                <pad-btn key-name="s" @action="soundChange($event)"></pad-btn>
-            </div>
+          <div class="pads-line">
+            <pad-btn key-name="q" @action="soundChange($event)"></pad-btn>
+            <pad-btn key-name="w" @action="soundChange($event)"></pad-btn>
+          </div>
+          <div class="pads-line">
+            <pad-btn key-name="a" @action="soundChange($event)"></pad-btn>
+            <pad-btn key-name="s" @action="soundChange($event)"></pad-btn>
+          </div>
         </div>
 
         <div class="control">
-            <button class="control-btn" @click="switchPads">
-                E
-            </button>
-            <div class="control-btn-label">swap pads</div>
+          <button class="control-btn" @click="switchPads">E</button>
+          <div class="control-btn-label">swap pads</div>
 
-            <div class="control-line"></div>
+          <div class="control-line"></div>
 
-            <button class="control-btn" @click="clearLoop">
-                D
-            </button>
-            <div class="control-btn-label">clear loop</div>
+          <button class="control-btn" @click="clearLoop">D</button>
+          <div class="control-btn-label">clear loop</div>
 
-            <div class="control-line"></div>
+          <div class="control-line"></div>
 
-            <button class="control-btn" @click="initRecord" :class="{'waiting': isWantToRecord}" :disabled="isRecording">
-                C
-            </button>
-            <div class="control-btn-label">rec</div>
+          <button
+            class="control-btn"
+            @click="initRecord"
+            :class="{'waiting': isWantToRecord}"
+            :disabled="isRecording"
+          >
+            C
+          </button>
+          <div class="control-btn-label">rec</div>
         </div>
 
         <div class="midi-frame__right">
-            <div class="midi-frame__right-top">
-                <div class="midi-frame__right-top__btn">
-                    <button class="control-btn" @click="isPause ? playLoops() : pauseLoops()">
-                        R
-                    </button>
-                    <div class="control-btn-label">play/stop</div>
-                </div>
-                <div class="midi-frame__right-top-lines">
-                    <div class="midi-frame__right-top-line"></div>
-                    <div class="midi-frame__right-top-line"></div>
-                    <div class="midi-frame__right-top-line"></div>
-                </div>
+          <div class="midi-frame__right-top">
+            <div class="midi-frame__right-top__btn">
+              <button
+                class="control-btn"
+                @click="isPause ? playLoops() : pauseLoops()"
+              >
+                R
+              </button>
+              <div class="control-btn-label">play/stop</div>
             </div>
-            <div class="filter-control">
-                <div class="filter-control-item">
-                    <effect-control-view effect-name="Reverb" :level="reverbLevel">
-                    </effect-control-view>
-                    <effect-control effect-name="Reverb"
-                                    :level="reverbLevel"
-                                    key-up="g"
-                                    key-down="f"
-                                    @action="effectChange($event)">
-                    </effect-control>
-                </div>
-                <div class="filter-control-item">
-                    <effect-control-view effect-name="Delay" :level="delayLevel">
-                    </effect-control-view>
-                    <effect-control effect-name="Delay"
-                                    :level="delayLevel"
-                                    key-up="j"
-                                    key-down="h"
-                                    @action="effectChange($event)">
-                    </effect-control>
-                </div>
-                <div class="filter-control-item">
-                    <effect-control-view effect-name="Low Pass" :level="lowPassLevel">
-                    </effect-control-view>
-                    <effect-control effect-name="Low Pass"
-                                    :level="lowPassLevel"
-                                    key-up="l"
-                                    key-down="k"
-                                    @action="effectChange($event)">
-                    </effect-control>
-                </div>
+            <div class="midi-frame__right-top-lines">
+              <div class="midi-frame__right-top-line"></div>
+              <div class="midi-frame__right-top-line"></div>
+              <div class="midi-frame__right-top-line"></div>
             </div>
+          </div>
+          <div class="filter-control">
+            <div class="filter-control-item">
+              <effect-control-view effect-name="Reverb" :level="reverbLevel">
+              </effect-control-view>
+              <effect-control
+                effect-name="Reverb"
+                :level="reverbLevel"
+                key-up="g"
+                key-down="f"
+                @action="effectChange($event)"
+              >
+              </effect-control>
+            </div>
+            <div class="filter-control-item">
+              <effect-control-view effect-name="Delay time" :level="delayLevel">
+              </effect-control-view>
+              <effect-control
+                effect-name="Delay time"
+                :level="delayLevel"
+                key-up="j"
+                key-down="h"
+                @action="effectChange($event)"
+              >
+              </effect-control>
+            </div>
+            <div class="filter-control-item">
+              <effect-control-view effect-name="Low Pass" :level="lowPassLevel">
+              </effect-control-view>
+              <effect-control
+                effect-name="Low Pass"
+                :level="lowPassLevel"
+                key-up="l"
+                key-down="k"
+                @action="effectChange($event)"
+              >
+              </effect-control>
+            </div>
+          </div>
         </div>
 
         <div class="midi-frame-bg"></div>
-        
+
         <div class="metronom-wrapper">
-            <div class="metronom" :class="{ 'active': isMetronome }" @click="switchMetronome"></div>
-            <div class="text">M</div>
+          <div
+            class="metronom"
+            :class="{ 'active': isMetronome }"
+            @click="switchMetronome"
+          ></div>
+          <div class="text">M</div>
         </div>
-    
-    </div>
-</main>
+      </div>
+    </main>
 
-<!-- Effect Control View -->
-<template id="effect-control-view-template">
-    <div class="effect-control__item">
+    <!-- Effect Control View -->
+    <template id="effect-control-view-template">
+      <div class="effect-control__item">
         <div class="effect-control__item-controller">
+          <div
+            class="effect-control__item-controller-btn"
+            :style="{'transform': `rotate(${rotateDegree[level]})`}"
+          >
+            <div class="effect-control__item-controller-line"></div>
+          </div>
 
-            <div class="effect-control__item-controller-btn"
-                :style="{'transform': `rotate(${rotateDegree[level]})`}">
-                <div class="effect-control__item-controller-line"></div>
-            </div>
-
-            <div class="effect-control__item-controller-dot"
-                 :class="{'active': i - 1 == level}"
-                 v-for="i in 11"
-                 :key="i">
-            </div>
+          <div
+            class="effect-control__item-controller-dot"
+            :class="{'active': i - 1 == level}"
+            v-for="i in 11"
+            :key="i"
+          ></div>
         </div>
 
         <div class="effect-control__item-title">{{effectName}}</div>
-    </div>
-</template>
+      </div>
+    </template>
 
-<template id="effect-control-template">
-    <div class="effect-control">
+    <template id="effect-control-template">
+      <div class="effect-control">
         <div class="effect-control-level">
-            <div class="effect-control-level__line"
-                 v-for="i in 10"
-                 :key="i"
-                 :class="{'active': i - 1 < level}"
-                 :style="{height: i * 10 + '%'}"></div>
+          <div
+            class="effect-control-level__line"
+            v-for="i in 10"
+            :key="i"
+            :class="{'active': i - 1 < level}"
+            :style="{height: i * 10 + '%'}"
+          ></div>
         </div>
         <div class="effect-control-btns">
-            <button class="effect-control-btn"
-                    @click="changeDown"
-                    :class="{'active': isDown}">
-                <div>
-                    {{keyDown}}
-                </div>    
-            </button>
-            <button class="effect-control-btn"
-                    @click="changeUp"
-                    :class="{'active': isUp}">
-                <div>
-                    {{keyUp}}
-                </div>
-            </button>
+          <button
+            class="effect-control-btn"
+            @click="changeDown"
+            :class="{'active': isDown}"
+          >
+            <div>{{keyDown}}</div>
+          </button>
+          <button
+            class="effect-control-btn"
+            @click="changeUp"
+            :class="{'active': isUp}"
+          >
+            <div>{{keyUp}}</div>
+          </button>
         </div>
         <!-- <div class="effect-control-title">{{effectName}}</div> -->
-    </div>
-</template>
+      </div>
+    </template>
 
-<!--Pad Button Template-->
-<template id="pad-btn-template">
-    <button class="pads-btn"
-            :class="{'active': isPlay}"
-            @mouseup="stopSound"
-            @mousedown="playSound"
-    >
-    <div>{{keyName}}</div>
-</button>
-</template>
+    <!--Pad Button Template-->
+    <template id="pad-btn-template">
+      <button
+        class="pads-btn"
+        :class="{'active': isPlay}"
+        @mouseup="stopSound"
+        @mousedown="playSound"
+      >
+        <div>{{keyName}}</div>
+      </button>
+    </template>
 
-
-<script src="index.js"></script>
-</body>
+    <script src="index.js"></script>
+  </body>
 </html>

@@ -15,8 +15,7 @@ import piano3 from './audio/piano/piano_3.wav';
 import piano4 from './audio/piano/piano_4.wav';
 
 import metronomeSound from './audio/metronom.mp3';
-
-
+  
 // Effect control view cmp
 Vue.component('effect-control-view', {
   template: '#effect-control-view-template',
@@ -123,7 +122,7 @@ new Vue({
     ],
     activePads: 0,
 
-    loopTime: 4000,
+    loopTime: 3780,
     loopsInterval: null,
     group: null,
     isInited: false,
@@ -140,7 +139,7 @@ new Vue({
 
     reverbFilter: new Pizzicato.Effects.Reverb({
       time: 0.01,
-      decay: 0.01,
+      decay: 3,
       reverse: false,
       mix: 0.5
     }),
@@ -172,20 +171,34 @@ new Vue({
     },
     // Start Midi Frame
     initMidiFrame() {
-      this.au_1 = this.initSound(this.pads[this.activePads][0]);
+      try {
+        this.au_1 = this.initSound(this.pads[this.activePads][0]);
       this.au_2 = this.initSound(this.pads[this.activePads][1]);
       this.au_3 = this.initSound(this.pads[this.activePads][2]);
       this.au_4 = this.initSound(this.pads[this.activePads][3]);
   
       if(!this.isInited) {
         console.log('Inited')
-        let context = new AudioContext();
-        this.group = new Pizzicato.Group([this.au_1, this.au_2, this.au_3, this.au_4]);
-        this.isInited = true;
+        var AudioContext = window.AudioContext // Default
+            || window.webkitAudioContext // Safari and old versions of Chrome
+            || false; 
+
+        if (AudioContext) {
+            var ctx = new AudioContext;
+            this.group = new Pizzicato.Group([this.au_1, this.au_2, this.au_3, this.au_4]);
+            this.isInited = true;
+        } else {
+            // Web Audio API is not supported
+            // Alert the user
+            alert("Sorry, but the Web Audio API is not supported by your browser. Please, consider upgrading to the latest version or downloading Google Chrome or Mozilla Firefox");
+        }
       } else {
         let effects = this.group.effects;
         this.group = new Pizzicato.Group([this.au_1, this.au_2, this.au_3, this.au_4]);
         effects.forEach(eff => this.group.addEffect(eff));
+      }
+      } catch (error) {
+        alert(error.message) 
       }
     },
     // Handle Sound Change
@@ -248,7 +261,7 @@ new Vue({
             this.reverbLevel--;
           }
           break;
-        case 'Delay':
+        case 'Delay time':
           if(change.type === 'up' && this.delayLevel < 10) {
             this.setEffect('delayFilter', 1 / 10, this.group);
             this.delayLevel++;
@@ -423,3 +436,4 @@ new Vue({
     }); 
   }
 });
+
